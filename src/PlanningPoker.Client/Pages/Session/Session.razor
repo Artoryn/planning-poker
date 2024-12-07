@@ -50,6 +50,17 @@
                             </label>
                         </div>
                         <div class="form-group">
+                            <label>
+                                Participant tag
+                                <select @bind="@_tag"
+                                        class="custom-select">
+                                    <option value="@PlayerTag.None">None</option>
+                                    <option value="@PlayerTag.Developer">Developer</option>
+                                    <option value="@PlayerTag.Analyst">Analyst</option>
+                                </select>
+                            </label>
+                        </div>
+                        <div class="form-group">
                             <button @onclick="Join" disabled="@(string.IsNullOrWhiteSpace(_username))" class="btn btn-primary" type="submit">Join</button>
                         </div>
                     </form>
@@ -74,6 +85,8 @@
     private Guid _recoveryId = Guid.NewGuid();
 
     private PlayerType _type = PlayerType.Participant;
+
+    private PlayerTag _tag = PlayerTag.None;
 
     private PlayerViewModel? _currentPlayer;
 
@@ -121,7 +134,7 @@
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (!firstRender) return;
-        
+
         await ReconnectIfApplicable();
     }
 
@@ -185,6 +198,7 @@
             _username = savedSession.Username;
             _type = savedSession.Type;
             _recoveryId = savedSession.RecoveryId;
+            _tag = savedSession.Tag;
             await Join();
             StateHasChanged();
         }
@@ -193,13 +207,14 @@
     async Task Join()
     {
         await _hubClient.Connect(_parsedId);
-        _currentPlayer = await _hubClient.JoinServer(_parsedId, _recoveryId, _username, _type);
+        _currentPlayer = await _hubClient.JoinServer(_parsedId, _recoveryId, _username, _type, _tag);
         var serverSession = new ServerSession
         {
             ServerId = _parsedId,
             Username = _username,
             RecoveryId = _recoveryId,
-            Type = _type
+            Type = _type,
+            Tag = _tag
         };
 
         sessionManager.SetSession(serverSession);

@@ -49,9 +49,9 @@ namespace PlanningPoker.Server.Hubs
             return _pokerEngine.RoomExists(roomId);
         }
 
-        public PlayerViewModel Join(Guid id, Guid recoveryId, string playerName, Engine.Core.Models.PlayerType type)
+        public PlayerViewModel Join(Guid id, Guid recoveryId, string playerName, Engine.Core.Models.PlayerType type, Engine.Core.Models.PlayerTag tag)
         {
-            var joinedPlayer = _pokerEngine.JoinRoom(id, recoveryId, playerName, GetPlayerPrivateId(), type);
+            var joinedPlayer = _pokerEngine.JoinRoom(id, recoveryId, playerName, GetPlayerPrivateId(), type, tag);
             return joinedPlayer.Map(includePrivateId: true);
         }
 

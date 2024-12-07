@@ -54,7 +54,7 @@ namespace PlanningPoker.FunctionalTests.Tests.Hubs
             SemaphoreSlim awaitResponse = new SemaphoreSlim(0);
             builder.HubClient.OnSessionUpdated(viewModel =>
             {
-                actualVote = viewModel.CurrentSession.Votes[player.PublicId.ToString()];
+                actualVote = viewModel.CurrentSession.Votes[player.PublicId.ToString()].Value;
                 awaitResponse.Release();
             });
 
@@ -80,7 +80,7 @@ namespace PlanningPoker.FunctionalTests.Tests.Hubs
             SemaphoreSlim awaitResponse = new SemaphoreSlim(0);
             builder.HubClient.OnSessionUpdated(viewModel =>
             {
-                actualVote = viewModel.CurrentSession.Votes[player.PublicId.ToString()];
+                actualVote = viewModel.CurrentSession.Votes[player.PublicId.ToString()].Value;
                 awaitResponse.Release();
             });
 

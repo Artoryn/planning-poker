@@ -67,7 +67,7 @@ namespace PlanningPoker.FunctionalTests.Tests.Hubs
             SemaphoreSlim awaitResponse = new SemaphoreSlim(0);
             playerConnections[1].OnSessionUpdated(viewModel =>
             {
-                actualVotes = viewModel.CurrentSession.Votes.Values.ToList();
+                actualVotes = viewModel.CurrentSession.Votes.Select(x => x.Value.Value).ToList();
                 isShown = viewModel.CurrentSession.IsShown;
                 awaitResponse.Release();
             });

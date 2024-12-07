@@ -119,7 +119,7 @@ namespace PlanningPoker.FunctionalTests.Tests.Hubs
             Assert.Equal("?", updatedSession.CurrentSession.CardSet[7]);
             Assert.Equal(1, updatedSession.CurrentSession.Votes.Count);
             Assert.NotNull(updatedSession.CurrentSession.Votes[player.PublicId.ToString()]);
-            Assert.Equal(validVote, updatedSession.CurrentSession.Votes[player.PublicId.ToString()]);
+            Assert.Equal(validVote, updatedSession.CurrentSession.Votes[player.PublicId.ToString()].Value);
         }
 
         [Fact]

@@ -9,7 +9,7 @@ namespace PlanningPoker.Engine.Core.Models.Poker
         public PokerSession(IList<string> cardSet)
         {
             IsShown = false;
-            Votes = new ConcurrentDictionary<int, string>();
+            Votes = new ConcurrentDictionary<int, Vote>();
             CardSet = cardSet;
         }
 
@@ -33,11 +33,11 @@ namespace PlanningPoker.Engine.Core.Models.Poker
 
         public bool CanVote => !IsShown;
 
-        public IDictionary<int, string> Votes { get; set; }
+        public IDictionary<int, Vote> Votes { get; set; }
 
         public IList<string> CardSet { get; set; }
 
-        public void SetVote(int playerPublicId, string vote)
+        public void SetVote(int playerPublicId, Vote vote)
         {
             Votes[playerPublicId] = vote;
         }

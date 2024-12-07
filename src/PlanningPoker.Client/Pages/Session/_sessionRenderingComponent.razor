@@ -20,7 +20,7 @@
                 {
                     var hasVoted = Server?.CurrentSession?.Votes?.ContainsKey(player.PublicId.ToString()) ?? false;
                     var isAsleep = player.Mode == PlayerMode.Asleep;
-                    var currentPlayerVote = hasVoted ? Server.CurrentSession.Votes[player.PublicId.ToString()] : string.Empty;
+                    var currentPlayerVote = hasVoted ? string.Empty : string.Empty;
                     <tr class="@(hasVoted ? "table-success" : "") @(isAsleep ? "asleep" : "")">
                         <td>
                             @if (hasVoted && !isAsleep)
@@ -33,7 +33,7 @@
                             }
                         </td>
                         <td>
-                            @player.Name
+                            @player.Name - @player.Tag
                         </td>
                         <td>
                             @currentPlayerVote
@@ -77,7 +77,7 @@
                     var isAsleep = player.Mode == PlayerMode.Asleep;
                     <tr class="@(isAsleep ? "asleep" : "")">
                         <td>
-                            @player.Name
+                            @player.Name - @player.Tag
                         </td>
                         <td>
                             @if (CurrentPlayer.PublicId == player.PublicId)

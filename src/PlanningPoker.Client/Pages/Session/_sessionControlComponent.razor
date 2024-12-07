@@ -1,6 +1,7 @@
 ﻿@using PlanningPoker.Hub.Client.Abstractions
 @using PlanningPoker.Hub.Client.Abstractions.ViewModels
 @using PlanningPoker.Hub.Client.Abstractions.ViewModels.Poker
+@using System.Diagnostics
 <div class="card poker_cards">
     <div class="card-body">
         <h5 class="card-title">Poker cards</h5>
@@ -44,14 +45,20 @@
                     {
                         <table class="table table-striped">
                             <tbody>
-                            <tr>
-                                <td>Avg. value</td>
-                                <td>@(GetVoteAvg()?.ToString("#.#"))</td>
-                            </tr>
-                            <tr>
-                                <td>Mode value</td>
-                                <td>@string.Join(", ", GetVoteMode())</td>
-                            </tr>
+                                <tr>
+                                    <td>Avg. value</td>
+                                    <td>@string.Join(", ", GetVoteAvg())</td>
+                                </tr>
+                                @foreach (PlayerTag type in Enum.GetValues(typeof(PlayerTag)))
+                                {
+                                    if (type != PlayerTag.None)
+                                    {
+                                        <tr>
+                                            <td>@($"{type} Avg. value")</td>
+                                            <td>@string.Join(", ", GetVoteAvg(type))</td>
+                                        </tr>
+                                    }
+                                }
                             </tbody>
                         </table>
                     }
@@ -100,7 +107,7 @@
     IEnumerable<string?> GetVoteMode()
     {
         var sortedVoteGroups = Session?.Votes?
-            .Select(unparsedVote => unparsedVote.Value)
+            .Select(unparsedVote => unparsedVote.Value.Value)
             .Where(vote => vote != null)
             .GroupBy(parsedVote => parsedVote)
             .OrderByDescending(group => group.Count());
@@ -135,7 +142,38 @@
         }
 
         var totalValidVotes = Session.Votes
-            .Select(unparsedVote => DecimalParseOrNull(unparsedVote.Value))
+            .Select(unparsedVote => DecimalParseOrNull(unparsedVote.Value.Value))
+            .Count(vote => vote != null);
+        if (totalValidVotes == 0)
+        {
+            return default;
+        }
+
+        return sum.Value / totalValidVotes;
+    }
+
+    decimal? GetVoteAvg(PlayerTag playerTag)
+    {
+        if (!Session.IsShown)
+        {
+            return default;
+        }
+
+        if (Session?.Votes == null || !Session.Votes.Any())
+        {
+            return default;
+        }
+
+        var sum = CalculateSum(playerTag);
+        if (!sum.HasValue)
+        {
+
+            return default;
+        }
+
+        var totalValidVotes = Session.Votes
+            .Where(voteTag => voteTag.Value.Tag == playerTag)
+            .Select(unparsedVote => DecimalParseOrNull(unparsedVote.Value.Value))
             .Count(vote => vote != null);
         if (totalValidVotes == 0)
         {
@@ -147,7 +185,12 @@
 
     decimal? CalculateSum()
     {
-        return Session.Votes?.Sum(pair => DecimalParseOrNull(pair.Value) ?? default);
+        return Session.Votes?.Sum(pair => DecimalParseOrNull(pair.Value.Value) ?? default);
+    }
+
+    decimal? CalculateSum(PlayerTag playerTag)
+    {
+        return Session.Votes?.Where(x => x.Value.Tag == playerTag).Sum(pair => (DecimalParseOrNull(pair.Value.Value) ?? default) * 2) / 2;
     }
 
     decimal? DecimalParseOrNull(string val)

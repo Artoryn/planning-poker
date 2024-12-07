@@ -9,5 +9,6 @@ namespace PlanningPoker.Client.Storage
         public string? Username { get; set; }
         public Guid RecoveryId { get; set; }
         public PlayerType Type { get; set; }
+        public PlayerTag Tag { get; set; }
     }
 }

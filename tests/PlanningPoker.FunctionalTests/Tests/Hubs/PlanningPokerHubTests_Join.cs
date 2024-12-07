@@ -21,10 +21,11 @@ namespace PlanningPoker.FunctionalTests.Tests.Hubs
             var builder = CreateBuilder();
             var expectedPlayerName = "playerName1";
             var expectedPlayerType = PlayerType.Participant;
+            var expectedPlayerTag = PlayerTag.None;
             var recoveryId = Guid.NewGuid();
 
             // Act
-            var exceptionRecord = await Record.ExceptionAsync(() => builder.HubClient.JoinServer(Guid.NewGuid(), recoveryId, expectedPlayerName, expectedPlayerType));
+            var exceptionRecord = await Record.ExceptionAsync(() => builder.HubClient.JoinServer(Guid.NewGuid(), recoveryId, expectedPlayerName, expectedPlayerType, expectedPlayerTag));
 
             // Assert
             Assert.NotNull(exceptionRecord);
@@ -38,10 +39,11 @@ namespace PlanningPoker.FunctionalTests.Tests.Hubs
             builder.WithServer(out var serverId);
             var expectedPlayerName = "playerName1";
             var expectedPlayerType = PlayerType.Participant;
+            var expectedPlayerTag = PlayerTag.None;
             var recoveryId = Guid.NewGuid();
 
             // Act
-            var result = await builder.HubClient.JoinServer(serverId, recoveryId, expectedPlayerName, expectedPlayerType);
+            var result = await builder.HubClient.JoinServer(serverId, recoveryId, expectedPlayerName, expectedPlayerType, expectedPlayerTag);
 
             // Assert
             Assert.NotNull(result);
@@ -71,12 +73,13 @@ namespace PlanningPoker.FunctionalTests.Tests.Hubs
                 "player3",
             };
             var expectedPlayerType = PlayerType.Participant;
+            var expectedPlayerTag = PlayerTag.None;
 
             // Act
             var results = new List<PlayerViewModel?>();
             for (var i = 0; i < playerConnections.Count; i++)
             {
-                results.Add(await playerConnections[i].JoinServer(serverId, Guid.NewGuid(), expectedPlayerNames[i], expectedPlayerType));
+                results.Add(await playerConnections[i].JoinServer(serverId, Guid.NewGuid(), expectedPlayerNames[i], expectedPlayerType, expectedPlayerTag));
             }
 
             // Assert
@@ -98,10 +101,11 @@ namespace PlanningPoker.FunctionalTests.Tests.Hubs
             builder.WithServer(out var serverId);
             var expectedPlayerName = "";
             var expectedPlayerType = PlayerType.Participant;
+            var expectedPlayerTag = PlayerTag.None;
             var recoveryId = Guid.NewGuid();
 
             // Act
-            var exceptionRecord = await Record.ExceptionAsync(() => builder.HubClient.JoinServer(serverId, recoveryId, expectedPlayerName, expectedPlayerType));
+            var exceptionRecord = await Record.ExceptionAsync(() => builder.HubClient.JoinServer(serverId, recoveryId, expectedPlayerName, expectedPlayerType, expectedPlayerTag));
 
             // Assert
             Assert.NotNull(exceptionRecord);
@@ -115,10 +119,11 @@ namespace PlanningPoker.FunctionalTests.Tests.Hubs
             builder.WithServer(out var serverId);
             var expectedPlayerName = "observerName1";
             var expectedPlayerType = PlayerType.Observer;
+            var expectedPlayerTag = PlayerTag.None;
             var recoveryId = Guid.NewGuid();
 
             // Act
-            var result = await builder.HubClient.JoinServer(serverId, recoveryId, expectedPlayerName, expectedPlayerType);
+            var result = await builder.HubClient.JoinServer(serverId, recoveryId, expectedPlayerName, expectedPlayerType, expectedPlayerTag);
 
             // Assert
             Assert.NotNull(result);

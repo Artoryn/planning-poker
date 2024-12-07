@@ -24,7 +24,7 @@ namespace PlanningPoker.Engine.Core.Models
 
         public DateTime Created { get; set; }
 
-        public Player AddOrUpdatePlayer(Guid recoveryId, string playerPrivateId, string playerName, PlayerType type)
+        public Player AddOrUpdatePlayer(Guid recoveryId, string playerPrivateId, string playerName, PlayerType type, PlayerTag tag)
         {
             Player player;
 
@@ -38,7 +38,7 @@ namespace PlanningPoker.Engine.Core.Models
             else
             {
                 var publicId = GeneratePublicId(Players);
-                player = new Player(playerPrivateId, recoveryId, publicId, playerName, type);
+                player = new Player(playerPrivateId, recoveryId, publicId, playerName, type, tag);
                 Players[playerPrivateId] = player;
             }
 

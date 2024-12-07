@@ -3,6 +3,7 @@ using System.Linq;
 using PlanningPoker.Engine.Core.Models;
 using PlanningPoker.Engine.Core.Models.Poker;
 using PlanningPoker.Hub.Client.Abstractions.ViewModels.Poker;
+using VoteViewModel = PlanningPoker.Hub.Client.Abstractions.ViewModels.VoteViewModel;
 
 namespace PlanningPoker.Server.ViewModelMappers
 {
@@ -24,11 +25,11 @@ namespace PlanningPoker.Server.ViewModelMappers
             return viewModel;
         }
 
-        private static IDictionary<string, string> MapVotes(PokerSession session)
+        private static IDictionary<string, VoteViewModel> MapVotes(PokerSession session)
         {
             var votes = session.IsShown
-                ? session.Votes.ToDictionary(pair => pair.Key.ToString(), pair => pair.Value.ToString())
-                : session.Votes.ToDictionary(pair => pair.Key.ToString(), pair => "?");
+                ? session.Votes.ToDictionary(pair => pair.Key.ToString(), pair => new VoteViewModel((int)pair.Value.Tag, pair.Value.Value))
+                : session.Votes.ToDictionary(pair => pair.Key.ToString(), pair => new VoteViewModel("?"));
 
             return votes;
         }
