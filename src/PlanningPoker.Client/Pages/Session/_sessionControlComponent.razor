@@ -46,18 +46,15 @@
                         <table class="table table-striped">
                             <tbody>
                                 <tr>
-                                    <td>Avg. value</td>
-                                    <td>@string.Join(", ", GetVoteAvg())</td>
+                                    <td>Total value (excludes "None" tag votes)</td>
+                                    <td>@string.Join(", ", GetTotalValue()?.ToString("0.##")) (@GetRoundedTotalValue()?.ToString("0.##"))</td>
                                 </tr>
                                 @foreach (PlayerTag type in Enum.GetValues(typeof(PlayerTag)))
                                 {
-                                    if (type != PlayerTag.None)
-                                    {
-                                        <tr>
-                                            <td>@($"{type} Avg. value")</td>
-                                            <td>@string.Join(", ", GetVoteAvg(type))</td>
-                                        </tr>
-                                    }
+                                    <tr>
+                                        <td>@($"{type} Avg. value")</td>
+                                        <td>@string.Join(", ", GetVoteAvg(type)?.ToString("0.##"))</td>
+                                    </tr>
                                 }
                             </tbody>
                         </table>
@@ -107,7 +104,7 @@
     IEnumerable<string?> GetVoteMode()
     {
         var sortedVoteGroups = Session?.Votes?
-            .Select(unparsedVote => unparsedVote.Value.Value)
+            .Select(unparsedVote => unparsedVote.Value)
             .Where(vote => vote != null)
             .GroupBy(parsedVote => parsedVote)
             .OrderByDescending(group => group.Count());
@@ -142,7 +139,7 @@
         }
 
         var totalValidVotes = Session.Votes
-            .Select(unparsedVote => DecimalParseOrNull(unparsedVote.Value.Value))
+            .Select(unparsedVote => DecimalParseOrNull(unparsedVote.Value))
             .Count(vote => vote != null);
         if (totalValidVotes == 0)
         {
@@ -172,8 +169,8 @@
         }
 
         var totalValidVotes = Session.Votes
-            .Where(voteTag => voteTag.Value.Tag == playerTag)
-            .Select(unparsedVote => DecimalParseOrNull(unparsedVote.Value.Value))
+            .Where(vote => Session?.VoteTags?.ContainsKey(vote.Key) == true && Session.VoteTags[vote.Key] == (int)playerTag)
+            .Select(unparsedVote => DecimalParseOrNull(unparsedVote.Value))
             .Count(vote => vote != null);
         if (totalValidVotes == 0)
         {
@@ -183,14 +180,71 @@
         return sum.Value / totalValidVotes;
     }
 
+    decimal? GetTotalValue()
+    {
+        if (!Session.IsShown)
+        {
+            return default;
+        }
+
+        if (Session?.Votes == null || !Session.Votes.Any())
+        {
+            return default;
+        }
+
+        var noneSum = GetVoteAvg(PlayerTag.None);
+        var devSum = GetVoteAvg(PlayerTag.Developer);
+        var qaSum = GetVoteAvg(PlayerTag.Analyst);
+
+        var totalEffort = (devSum ?? 0m) + (qaSum ?? 0m);
+
+        return totalEffort;
+    }
+
+    decimal? GetRoundedTotalValue()
+    {
+        if (!Session.IsShown)
+        {
+            return default;
+        }
+
+        if (Session?.Votes == null || !Session.Votes.Any())
+        {
+            return default;
+        }
+
+        var noneSum = GetVoteAvg(PlayerTag.None);
+        var devSum = GetVoteAvg(PlayerTag.Developer);
+        var qaSum = GetVoteAvg(PlayerTag.Analyst);
+
+        var totalValue = Math.Ceiling((devSum ?? 0m) + (qaSum ?? 0m));
+
+        if (Session?.CardSet?.Count > 4 &&
+            Session.CardSet[2] == "3" &&
+            Session.CardSet[3] == "5")
+        {
+            foreach (var card in Session.CardSet.Select(x => DecimalParseOrNull(x)).Where(x => x != null).Order())
+            {
+                if (card > totalValue)
+                {
+                    return card; // Return the next highest value
+                }
+            }
+        }
+
+        return totalValue;
+    }
+
     decimal? CalculateSum()
     {
-        return Session.Votes?.Sum(pair => DecimalParseOrNull(pair.Value.Value) ?? default);
+        return Session.Votes?.Sum(pair => DecimalParseOrNull(pair.Value) ?? default);
     }
 
     decimal? CalculateSum(PlayerTag playerTag)
     {
-        return Session.Votes?.Where(x => x.Value.Tag == playerTag).Sum(pair => (DecimalParseOrNull(pair.Value.Value) ?? default) * 2) / 2;
+        return Session.Votes?
+            .Where(vote => Session?.VoteTags?.ContainsKey(vote.Key) == true && Session.VoteTags[vote.Key] == (int)playerTag)
+            .Sum(pair => (DecimalParseOrNull(pair.Value) ?? default) * 2) / 2;
     }
 
     decimal? DecimalParseOrNull(string val)

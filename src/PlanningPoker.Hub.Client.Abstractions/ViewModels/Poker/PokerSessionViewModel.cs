@@ -12,7 +12,8 @@ namespace PlanningPoker.Hub.Client.Abstractions.ViewModels.Poker
 
         public bool CanVote { get; set; }
 
-        public IDictionary<string, VoteViewModel>? Votes { get; set; }
+        public IDictionary<string, string>? Votes { get; set; }
+        public IDictionary<string, int>? VoteTags { get; set; }
 
         public IList<string>? CardSet { get; set; }
     }

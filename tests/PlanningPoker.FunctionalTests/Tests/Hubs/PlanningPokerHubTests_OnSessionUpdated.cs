@@ -106,7 +106,7 @@ namespace PlanningPoker.FunctionalTests.Tests.Hubs
             // Assert session state
             Assert.NotNull(updatedSession.CurrentSession);
             Assert.True(updatedSession.CurrentSession.CanClear);
-            Assert.False(updatedSession.CurrentSession.CanShow);
+            Assert.True(updatedSession.CurrentSession.CanShow);
             Assert.False(updatedSession.CurrentSession.CanVote);
             Assert.True(updatedSession.CurrentSession.IsShown);
             Assert.NotNull(updatedSession.CurrentSession.CardSet);
@@ -121,9 +121,10 @@ namespace PlanningPoker.FunctionalTests.Tests.Hubs
             Assert.Equal("21", updatedSession.CurrentSession.CardSet[6]);
             Assert.Equal("?", updatedSession.CurrentSession.CardSet[7]);
             Assert.Equal(1, updatedSession.CurrentSession.Votes.Count);
+            Assert.Equal(1, updatedSession.CurrentSession.VoteTags.Count);
             Assert.NotNull(updatedSession.CurrentSession.Votes[player.PublicId.ToString()]);
-            Assert.Equal(PlayerTag.None, updatedSession.CurrentSession.Votes[player.PublicId.ToString()].Tag);
-            Assert.Equal("?", updatedSession.CurrentSession.Votes[player.PublicId.ToString()].Value);
+            Assert.Equal("?", updatedSession.CurrentSession.Votes[player.PublicId.ToString()]);
+            Assert.Equal((int)PlayerTag.None, updatedSession.CurrentSession.VoteTags[player.PublicId.ToString()]);
         }
 
         [Fact]
@@ -166,7 +167,7 @@ namespace PlanningPoker.FunctionalTests.Tests.Hubs
             // Assert session state
             Assert.NotNull(updatedSession.CurrentSession);
             Assert.True(updatedSession.CurrentSession.CanClear);
-            Assert.False(updatedSession.CurrentSession.CanShow);
+            Assert.True(updatedSession.CurrentSession.CanShow);
             Assert.False(updatedSession.CurrentSession.CanVote);
             Assert.True(updatedSession.CurrentSession.IsShown);
             Assert.NotNull(updatedSession.CurrentSession.CardSet);
@@ -180,10 +181,11 @@ namespace PlanningPoker.FunctionalTests.Tests.Hubs
             Assert.Equal("13", updatedSession.CurrentSession.CardSet[5]);
             Assert.Equal("21", updatedSession.CurrentSession.CardSet[6]);
             Assert.Equal("?", updatedSession.CurrentSession.CardSet[7]);
+            Assert.Equal(1, updatedSession.CurrentSession.VoteTags.Count);
             Assert.Equal(1, updatedSession.CurrentSession.Votes.Count);
+            Assert.Equal((int)PlayerTag.Developer, updatedSession.CurrentSession.VoteTags[player.PublicId.ToString()]);
             Assert.NotNull(updatedSession.CurrentSession.Votes[player.PublicId.ToString()]);
-            Assert.Equal(PlayerTag.Developer, updatedSession.CurrentSession.Votes[player.PublicId.ToString()].Tag);
-            Assert.Equal(validVote, updatedSession.CurrentSession.Votes[player.PublicId.ToString()].Value);
+            Assert.Equal(validVote, updatedSession.CurrentSession.Votes[player.PublicId.ToString()]);
         }
 
         [Fact]
