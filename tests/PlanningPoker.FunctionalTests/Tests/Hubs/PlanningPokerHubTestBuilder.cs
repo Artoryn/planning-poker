@@ -53,7 +53,7 @@ namespace PlanningPoker.FunctionalTests.Tests.Hubs
 
         public PlanningPokerHubTestBuilder WithPlayer(Guid serverId, out PlayerViewModel player)
         {
-            return WithPlayer(serverId, Guid.NewGuid(), PlayerType.Participant, PlayerTag.None, Guid.NewGuid().ToString(), out player);
+            return WithPlayer(serverId, Guid.NewGuid(), PlayerType.Participant, PlayerTag.Developer, Guid.NewGuid().ToString(), out player);
         }
 
         public PlanningPokerHubTestBuilder WithObserver(Guid serverId, out PlayerViewModel player)
