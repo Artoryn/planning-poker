@@ -5,6 +5,7 @@ using PlanningPoker.Hub.Client.Abstractions;
 using PlanningPoker.Hub.Client.Abstractions.ViewModels;
 using PlanningPoker.Server.Infrastructure;
 using PlanningPoker.Server.ViewModelMappers;
+using System.Diagnostics;
 
 namespace PlanningPoker.Server.Hubs
 {
@@ -33,7 +34,12 @@ namespace PlanningPoker.Server.Hubs
 
         private void OnRoomUpdated(object? sender, RoomUpdatedEventArgs e)
         {
-            _hubContext.Clients.Group(e.ServerId.ToString()).SendAsync(BroadcastChannels.UPDATED, e.UpdatedServer.Map());
+            Debug.WriteLine(e.UpdatedServer?.Id);
+            Debug.WriteLine(e.UpdatedServer?.CurrentSession?.Votes?.Count);
+            var mappedValue = e.UpdatedServer?.Map() ?? null;
+            Debug.WriteLine(mappedValue?.Id);
+            Debug.WriteLine(mappedValue?.CurrentSession?.Votes?.Count);
+            _hubContext.Clients.Group(e.ServerId.ToString()).SendAsync(BroadcastChannels.UPDATED, mappedValue);
         }
 
         private void OnRoomCleared(object? sender, RoomClearedEventArgs e)

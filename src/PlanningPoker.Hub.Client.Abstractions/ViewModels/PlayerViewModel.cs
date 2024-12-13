@@ -15,5 +15,7 @@ namespace PlanningPoker.Hub.Client.Abstractions.ViewModels
         public PlayerType Type { get; set; }
 
         public PlayerMode Mode { get; set; }
+
+        public PlayerTag Tag { get; set; }
     }
 }

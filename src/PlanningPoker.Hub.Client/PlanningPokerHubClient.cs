@@ -44,9 +44,9 @@ namespace PlanningPoker.Hub.Client
             return _hubConnection.InvokeAsync<bool>(HubEndpointRoutes.Exists, serverId);
         }
 
-        public Task<PlayerViewModel> JoinServer(Guid serverId, Guid recoveryId, string playerName, PlayerType playerType)
+        public Task<PlayerViewModel> JoinServer(Guid serverId, Guid recoveryId, string playerName, PlayerType playerType, PlayerTag playerTag)
         {
-            return _hubConnection.InvokeAsync<PlayerViewModel>(HubEndpointRoutes.Join, serverId, recoveryId, playerName, playerType);
+            return _hubConnection.InvokeAsync<PlayerViewModel>(HubEndpointRoutes.Join, serverId, recoveryId, playerName, playerType, playerTag);
         }
 
         public Task KickPlayer(Guid serverId, string initiatingPlayerPublicId, int kickedPlayerPublicId)

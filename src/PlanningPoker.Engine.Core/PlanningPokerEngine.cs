@@ -18,7 +18,7 @@ namespace PlanningPoker.Engine.Core
         void SleepInAllRooms(string playerPrivateId);
         (bool wasCreated, Guid? serverId, string? validationMessages) CreateRoom(string desiredCardSet);
         bool RoomExists(Guid roomId);
-        Player JoinRoom(Guid id, Guid recoveryId, string playerName, string playerPrivateId, PlayerType type);
+        Player JoinRoom(Guid id, Guid recoveryId, string playerName, string playerPrivateId, PlayerType type, PlayerTag tag);
         void Vote(Guid serverId, string playerPrivateId, string vote);
         void RedactVote(Guid serverId, string playerPrivateId);
         void ClearVotes(Guid serverId, string playerPrivateId);
@@ -81,14 +81,14 @@ namespace PlanningPoker.Engine.Core
             return _serverStore.Exists(roomId);
         }
 
-        public Player JoinRoom(Guid id, Guid recoveryId, string playerName, string playerPrivateId, PlayerType type)
+        public Player JoinRoom(Guid id, Guid recoveryId, string playerName, string playerPrivateId, PlayerType type, PlayerTag tag)
         {
             if (string.IsNullOrWhiteSpace(playerName)) throw new MissingPlayerNameException();
 
             var server = _serverStore.Get(id);
             
             var formattedPlayerName = playerName.Length > MaxPlayerNameLength ? playerName.Substring(0, MaxPlayerNameLength) : playerName;
-            var newPlayer = server.AddOrUpdatePlayer(recoveryId, playerPrivateId, formattedPlayerName, type);
+            var newPlayer = server.AddOrUpdatePlayer(recoveryId, playerPrivateId, formattedPlayerName, type, tag);
             RaiseRoomUpdated(id, server);
             RaiseLogUpdated(id, newPlayer.Name, "Joined the server.");
             return newPlayer;
@@ -105,7 +105,7 @@ namespace PlanningPoker.Engine.Core
             if (player.Type == PlayerType.Observer) throw new VoteException($"Player is of type '{player.Type}' and cannot vote.");
             if (player.Mode == PlayerMode.Asleep) throw new VoteException($"Player is in mode '{player.Mode}', and cannot vote.");
 
-            server.CurrentSession.SetVote(player.PublicId, vote);
+            server.CurrentSession.SetVote(player.PublicId, new Models.Vote(player.Tag, vote));
             RaiseRoomUpdated(server.Id, server);
             RaiseLogUpdated(server.Id, player.Name, "Voted.");
         }

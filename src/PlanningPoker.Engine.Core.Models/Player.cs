@@ -9,7 +9,8 @@ namespace PlanningPoker.Engine.Core.Models
             Guid recoveryId,
             int publicId, 
             string name, 
-            PlayerType type)
+            PlayerType type,
+            PlayerTag tag = PlayerTag.None)
         {
             Id = id;
             RecoveryId = recoveryId;
@@ -17,6 +18,7 @@ namespace PlanningPoker.Engine.Core.Models
             Name = name;
             Type = type;
             Mode = PlayerMode.Awake;
+            Tag = tag;
         }
         
         public string Id { get; set; }
@@ -30,5 +32,7 @@ namespace PlanningPoker.Engine.Core.Models
         public PlayerType Type { get; set; }
 
         public PlayerMode Mode { get; set; }
+
+        public PlayerTag Tag { get; set; }
     }
 }
