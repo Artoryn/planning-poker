@@ -225,7 +225,7 @@
         {
             foreach (var card in Session.CardSet.Select(x => DecimalParseOrNull(x)).Where(x => x != null).Order())
             {
-                if (card > totalValue)
+                if (card >= totalValue)
                 {
                     return card; // Return the next highest value
                 }

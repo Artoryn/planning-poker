@@ -1,0 +1,26 @@
+name: Docker Image CI
+
+on:
+  workflow_dispatch:
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 'Checkout GitHub Action'
+      uses: actions/checkout@v4
+
+    - name: 'Login to GitHub Container Registry'
+      uses: docker/login-action@v1
+      with:
+        registry: ghcr.io
+        username: ${{github.actor}}
+        password: ${{secrets.GHCR_PUBLISH_TOKEN}}
+
+    - name: 'Build and publish Docker Image'
+      run: |
+          docker build . --file PlanningPoker.Server/Dockerfile --tag ghcr.io/artoryn/homeddns:latest
+          docker push ghcr.io/artoryn/planningpoker:latest

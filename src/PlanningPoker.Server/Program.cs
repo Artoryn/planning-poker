@@ -19,6 +19,7 @@ namespace PlanningPoker.Server
                     .AddCommandLine(args)
                     .Build())
                 .UseStartup<Startup>()
+                .UseUrls("http://*:80")
 
                 // Leaving commented code in the codebase is not a good idea,
                 // but I think this warrants an exception.
