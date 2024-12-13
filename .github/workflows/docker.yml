@@ -22,5 +22,5 @@ jobs:
 
     - name: 'Build and publish Docker Image'
       run: |
-          docker build . --file PlanningPoker.Server/Dockerfile --tag ghcr.io/artoryn/homeddns:latest
+          docker build . --file PlanningPoker.Server/Dockerfile --tag ghcr.io/artoryn/planningpoker:latest
           docker push ghcr.io/artoryn/planningpoker:latest
