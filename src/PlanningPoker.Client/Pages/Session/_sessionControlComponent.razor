@@ -11,7 +11,14 @@
             {
                 <div class="col card-wrapper">
                     <button class="btn @(card == _chosenCard ? "btn-success" : "btn-default") poker_card btn-lg" @onclick="() => Vote(card)" disabled="@(!Session.CanVote || CurrentPlayer.Type == PlayerType.Observer)">
+                        @if (card == ":daveexception:")
+                        {
+                            <img src="images\daveexception.webp" width="64" height="64"/>
+                        }
+                        else
+                        {
                         @card
+                        }
                     </button>
                 </div>
             }
@@ -44,18 +51,34 @@
                     @if (Session.IsShown)
                     {
                         <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Description</th>
+                                    <th>Raw avg.</th>
+                                    <th>Rounded avg.</th>
+                                </tr>
+                            </thead>
                             <tbody>
                                 <tr>
-                                    <td>Total value (excludes "None" tag votes)</td>
+                                    <td>Estimated total value (excludes "None" role)</td>
                                     <td>@string.Join(", ", GetTotalValue()?.ToString("0.##")) (@GetRoundedTotalValue()?.ToString("0.##"))</td>
+                                    <td>@string.Join(", ", GetTotalRoundedValue()?.ToString("0.##")) (@GetRoundedTotalRoundedValue()?.ToString("0.##"))</td>
                                 </tr>
-                                @foreach (PlayerTag type in Enum.GetValues(typeof(PlayerTag)))
-                                {
                                     <tr>
-                                        <td>@($"{type} Avg. value")</td>
-                                        <td>@string.Join(", ", GetVoteAvg(type)?.ToString("0.##"))</td>
+                                    <td>@($"Dev avg. value")</td>
+                                    <td>@string.Join(", ", GetVoteAvg(PlayerTag.Developer)?.ToString("0.##"))</td>
+                                    <td>@string.Join(", ", GetVoteRoundedAvg(PlayerTag.Developer)?.ToString("0.##"))</td>
                                     </tr>
-                                }
+                                <tr>
+                                    <td>@($"QA avg. value")</td>
+                                    <td>@string.Join(", ", GetVoteAvg(PlayerTag.Analyst)?.ToString("0.##"))</td>
+                                    <td>@string.Join(", ", GetVoteRoundedAvg(PlayerTag.Analyst)?.ToString("0.##"))</td>
+                                </tr>
+                                <tr>
+                                    <td>@($"None avg. value")</td>
+                                    <td>@string.Join(", ", GetVoteAvg(PlayerTag.None)?.ToString("0.##"))</td>
+                                    <td>@string.Join(", ", GetVoteRoundedAvg(PlayerTag.None)?.ToString("0.##"))</td>
+                                </tr>
                             </tbody>
                         </table>
                     }
@@ -76,6 +99,7 @@
     }
 
     private string _chosenCard;
+    private static readonly string[] _fibCardCheck = new string[] { "3", "4", "5" };
 
     async Task Vote(string vote)
     {
@@ -119,36 +143,6 @@
             .OrderBy(vote => vote);
     }
 
-    decimal? GetVoteAvg()
-    {
-        if (!Session.IsShown)
-        {
-            return default;
-        }
-
-        if (Session?.Votes == null || !Session.Votes.Any())
-        {
-            return default;
-        }
-
-        var sum = CalculateSum();
-        if(!sum.HasValue)
-        {
-
-            return default;
-        }
-
-        var totalValidVotes = Session.Votes
-            .Select(unparsedVote => DecimalParseOrNull(unparsedVote.Value))
-            .Count(vote => vote != null);
-        if (totalValidVotes == 0)
-        {
-            return default;
-        }
-
-        return sum.Value / totalValidVotes;
-    }
-
     decimal? GetVoteAvg(PlayerTag playerTag)
     {
         if (!Session.IsShown)
@@ -180,6 +174,40 @@
         return sum.Value / totalValidVotes;
     }
 
+    decimal? GetVoteRoundedAvg(PlayerTag playerTag)
+    {
+        if (!Session.IsShown)
+        {
+            return default;
+        }
+
+        if (Session?.Votes == null || !Session.Votes.Any())
+        {
+            return default;
+        }
+
+        var sum = CalculateSum(playerTag);
+        if (!sum.HasValue)
+        {
+
+            return default;
+        }
+
+        var totalValidVotes = Session.Votes
+            .Where(vote => Session?.VoteTags?.ContainsKey(vote.Key) == true && Session.VoteTags[vote.Key] == (int)playerTag)
+            .Select(unparsedVote => DecimalParseOrNull(unparsedVote.Value))
+            .Count(vote => vote != null);
+        if (totalValidVotes == 0)
+        {
+            return default;
+        }
+
+        var totalValue = sum.Value / totalValidVotes;
+        totalValue = GetNextHighestCardOrValue(totalValue);
+
+        return totalValue;
+    }
+
     decimal? GetTotalValue()
     {
         if (!Session.IsShown)
@@ -192,9 +220,28 @@
             return default;
         }
 
-        var noneSum = GetVoteAvg(PlayerTag.None);
         var devSum = GetVoteAvg(PlayerTag.Developer);
         var qaSum = GetVoteAvg(PlayerTag.Analyst);
+
+        var totalEffort = (devSum ?? 0m) + (qaSum ?? 0m);
+
+        return totalEffort;
+    }
+
+    decimal? GetTotalRoundedValue()
+    {
+        if (!Session.IsShown)
+        {
+            return default;
+        }
+
+        if (Session?.Votes == null || !Session.Votes.Any())
+        {
+            return default;
+        }
+
+        var devSum = GetVoteRoundedAvg(PlayerTag.Developer);
+        var qaSum = GetVoteRoundedAvg(PlayerTag.Analyst);
 
         var totalEffort = (devSum ?? 0m) + (qaSum ?? 0m);
 
@@ -213,26 +260,51 @@
             return default;
         }
 
-        var noneSum = GetVoteAvg(PlayerTag.None);
         var devSum = GetVoteAvg(PlayerTag.Developer);
         var qaSum = GetVoteAvg(PlayerTag.Analyst);
 
         var totalValue = Math.Ceiling((devSum ?? 0m) + (qaSum ?? 0m));
+        totalValue = GetNextHighestCardOrValue(totalValue);
 
-        if (Session?.CardSet?.Count > 4 &&
-            Session.CardSet[2] == "3" &&
-            Session.CardSet[3] == "5")
+        return totalValue;
+    }
+
+    decimal? GetRoundedTotalRoundedValue()
+    {
+        if (!Session.IsShown)
         {
-            foreach (var card in Session.CardSet.Select(x => DecimalParseOrNull(x)).Where(x => x != null).Order())
+            return default;
+        }
+
+        if (Session?.Votes == null || !Session.Votes.Any())
+        {
+            return default;
+        }
+
+        var devSum = GetVoteRoundedAvg(PlayerTag.Developer);
+        var qaSum = GetVoteRoundedAvg(PlayerTag.Analyst);
+
+        var totalValue = Math.Ceiling((devSum ?? 0m) + (qaSum ?? 0m));
+        totalValue = GetNextHighestCardOrValue(totalValue);
+
+        return totalValue;
+    }
+
+    decimal GetNextHighestCardOrValue(decimal value)
+    {
+        if (Session?.CardSet?.Count > 4 &&
+            Session.CardSet.Count(x => _fibCardCheck.Contains(x)) == 2)
+        {
+            foreach (decimal card in Session.CardSet.Select(x => DecimalParseOrNull(x)).Where(x => x != null).Select(x => x.HasValue ? x.Value : 0).Order())
             {
-                if (card >= totalValue)
+                if (card >= value)
                 {
                     return card; // Return the next highest value
                 }
             }
         }
 
-        return totalValue;
+        return value;
     }
 
     decimal? CalculateSum()

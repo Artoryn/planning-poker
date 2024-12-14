@@ -19,14 +19,7 @@ namespace PlanningPoker.Engine.Core.Models.Poker
         {
             return 
                 Votes.Count != 0
-                && !IsShown
-                && AllAwakeParticipantsVoted(participants);
-        }
-
-        private bool AllAwakeParticipantsVoted(IDictionary<string, Player> participants)
-        {
-            var awakeParticipants = participants.Values.Where(p => p.Type == PlayerType.Participant && p.Mode == PlayerMode.Awake).Select(p => p.PublicId);
-            return awakeParticipants.All(id => Votes.ContainsKey(id));
+                && !IsShown;
         }
 
         public bool CanClear => Votes.Any();
