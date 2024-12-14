@@ -92,6 +92,12 @@ namespace PlanningPoker.Engine.Core.Models
         {
             var player = GetPlayer(playerPrivateId);
             player.Mode = mode;
+
+            if (mode == PlayerMode.Asleep)
+                player.SleepDate = DateTime.UtcNow;
+            else
+                player.SleepDate = null;
+
             return player;
         }
 
