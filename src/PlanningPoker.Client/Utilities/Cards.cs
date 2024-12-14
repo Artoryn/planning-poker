@@ -14,7 +14,7 @@ namespace PlanningPoker.Client.Utilities
             "13",
             "21",
             "?",
-            ":daveexception:"
+            "de"
         };
     }
 }
