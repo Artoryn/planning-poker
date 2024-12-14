@@ -51,7 +51,7 @@ namespace PlanningPoker.Engine.Core
             {
                 RaisePlayerKicked(id, kickedPlayer);
                 RaiseRoomUpdated(id, server);
-                RaiseLogUpdated(id, player.Name, $"Kicked {kickedPlayer.Name}.");
+                RaiseLogUpdated(id, player.Name, $"Logged out {kickedPlayer.Name}.");
             }
         }
 

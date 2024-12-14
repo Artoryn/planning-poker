@@ -11,8 +11,8 @@
                         <th></th>
                         <th>Name</th>
                         <th>Vote</th>
-                        <th></th>
-                        <th></th>
+                        <th class="text-right">Switch to Observer</th>
+                        <th class="text-right">Logout</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -36,7 +36,14 @@
                             @player.Name - @player.Tag
                         </td>
                         <td>
-                            @currentPlayerVote
+                            @if (currentPlayerVote == "de")
+                            {
+                                <img src="images\daveexception.webp" height="24"/>
+                            }
+                            else
+                            {
+                                @currentPlayerVote
+                            }
                         </td>
                         <td>
                             @if (CurrentPlayer.PublicId == player.PublicId)
@@ -67,8 +74,8 @@
                 <thead>
                     <tr>
                         <th>Name</th>
-                        <th></th>
-                        <th></th>
+                        <th class="text-right">Switch to Participant</th>
+                        <th class="text-right">Logout</th>
                     </tr>
                 </thead>
                 <tbody>
