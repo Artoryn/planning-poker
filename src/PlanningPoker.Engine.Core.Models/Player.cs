@@ -32,6 +32,7 @@ namespace PlanningPoker.Engine.Core.Models
         public PlayerType Type { get; set; }
 
         public PlayerMode Mode { get; set; }
+        public DateTime? SleepDate { get; set; }
 
         public PlayerTag Tag { get; set; }
     }

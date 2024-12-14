@@ -89,9 +89,24 @@ namespace PlanningPoker.Engine.Core
             
             var formattedPlayerName = playerName.Length > MaxPlayerNameLength ? playerName.Substring(0, MaxPlayerNameLength) : playerName;
             var newPlayer = server.AddOrUpdatePlayer(recoveryId, playerPrivateId, formattedPlayerName, type, tag);
+
+            ClearOldAsleepPlayers(server, playerName);
+
             RaiseRoomUpdated(id, server);
             RaiseLogUpdated(id, newPlayer.Name, "Joined the server.");
             return newPlayer;
+        }
+
+        private void ClearOldAsleepPlayers(PokerServer server, string playerName)
+        {
+            var twoHourAgo = DateTime.UtcNow.AddHours(-2);
+            var asleepPlayers = server.Players.Where(x => x.Value.Mode == PlayerMode.Asleep && x.Value.SleepDate < twoHourAgo);
+
+            var player = asleepPlayers.Select(x => x.Value).FirstOrDefault(x => x.Name == playerName);
+            if (player != null)
+            {
+                server.RemovePlayer(player.Id);
+            }
         }
 
         public void Vote(Guid serverId, string playerPrivateId, string vote)
