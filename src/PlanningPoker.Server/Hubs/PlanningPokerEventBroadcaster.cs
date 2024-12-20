@@ -34,11 +34,7 @@ namespace PlanningPoker.Server.Hubs
 
         private void OnRoomUpdated(object? sender, RoomUpdatedEventArgs e)
         {
-            Debug.WriteLine(e.UpdatedServer?.Id);
-            Debug.WriteLine(e.UpdatedServer?.CurrentSession?.Votes?.Count);
             var mappedValue = e.UpdatedServer?.Map() ?? null;
-            Debug.WriteLine(mappedValue?.Id);
-            Debug.WriteLine(mappedValue?.CurrentSession?.Votes?.Count);
             _hubContext.Clients.Group(e.ServerId.ToString()).SendAsync(BroadcastChannels.UPDATED, mappedValue);
         }
 

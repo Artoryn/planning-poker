@@ -33,10 +33,10 @@
                             <label>
                                 Name
                                 <input @bind-value="_username"
-                                       @bind-value:event="oninput"
-                                       size="20"
-                                       class="form-control"
-                                       maxlength="20"/>
+                                @bind-value:event="oninput"
+                                size="20"
+                                class="form-control"
+                                maxlength="20"/>
                             </label>
                         </div>
                         @* Remove as all users should be participant by default
@@ -55,7 +55,7 @@
                             <label>
                                 Role
                                 <select @bind="@_tag"
-                                        class="custom-select">
+                                class="custom-select">
                                     <option value="@PlayerTag.None">None</option>
                                     <option value="@PlayerTag.Developer">Dev</option>
                                     <option value="@PlayerTag.Analyst">QA</option>
@@ -103,6 +103,30 @@
         set
         {
             _id = value;
+            switch (_id?.Trim().ToLower())
+            {
+                case "hitch":
+                    _id = "db164431-bf32-499a-8080-38eb5bb07768";
+                    break;
+                case "hitch-a":
+                    _id = "db164431-bf32-499a-8080-38eb5bb07769";
+                    break;
+                case "inventory":
+                    _id = "ebe5200e-614b-4dea-a454-f814acf92f19";
+                    break;
+                case "inventory-a":
+                    _id = "ebe5200e-614b-4dea-a454-f814acf92f10";
+                    break;
+                case "store":
+                    _id = "64abca5e-b4f0-4e3f-bdd7-ba36f1d485ef";
+                    break;
+                case "store-a":
+                    _id = "64abca5e-b4f0-4e3f-bdd7-ba36f1d485ea";
+                    break;
+                default:
+                    break;
+            }
+
             var validId = Guid.TryParse(_id, out var result);
             if (!validId)
             {

@@ -8,12 +8,13 @@ namespace PlanningPoker.Engine.Core.Models
 {
     public class PokerServer
     {
-        public PokerServer(Guid id, IList<string> cardSet)
+        public PokerServer(Guid id, IList<string> cardSet, bool persistent = false)
         {
             Id = id;
             Players = new ConcurrentDictionary<string, Player>();
             CurrentSession = new PokerSession(cardSet);
             Created = DateTime.UtcNow;
+            Persistent = persistent;
         }
 
         public Guid Id { get; set; }
@@ -23,6 +24,8 @@ namespace PlanningPoker.Engine.Core.Models
         public PokerSession CurrentSession { get; set; }
 
         public DateTime Created { get; set; }
+
+        public bool Persistent { get; set; }
 
         public Player AddOrUpdatePlayer(Guid recoveryId, string playerPrivateId, string playerName, PlayerType type, PlayerTag tag)
         {

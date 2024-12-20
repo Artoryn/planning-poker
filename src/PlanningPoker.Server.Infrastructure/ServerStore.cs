@@ -15,10 +15,10 @@ namespace PlanningPoker.Server.Infrastructure
             _servers = new ConcurrentDictionary<Guid, PokerServer>();
         }
 
-        public PokerServer Create(IList<string> cardSet)
+        public PokerServer Create(IList<string> cardSet, Guid? guid = null, bool persistent = false)
         {
-            var newServerId = Guid.NewGuid();
-            var newServer = new PokerServer(newServerId, cardSet);
+            var newServerId = guid.HasValue ? guid.Value : Guid.NewGuid();
+            var newServer = new PokerServer(newServerId, cardSet, persistent);
             _servers.Add(newServerId, newServer);
             return newServer;
         }
