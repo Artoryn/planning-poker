@@ -123,6 +123,11 @@ namespace PlanningPoker.Engine.Core
                 return (false, null, validationMessage);
             }
 
+            if (_serverStore.Count() > 20)
+            {
+                return (false, null, "To many servers created. Please try an existing server or wait for auto cleanup.");
+            }
+
             var server = _serverStore.Create(cardSet);
             return (true, server.Id, validationMessage);
         }

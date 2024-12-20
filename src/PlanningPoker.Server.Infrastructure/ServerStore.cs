@@ -38,6 +38,11 @@ namespace PlanningPoker.Server.Infrastructure
             return _servers.Values;
         }
 
+        public int Count()
+        {
+            return _servers.Count;
+        }
+
         public void Remove(PokerServer server)
         {
             _servers.Remove(server.Id);
