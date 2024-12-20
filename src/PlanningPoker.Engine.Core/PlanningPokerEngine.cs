@@ -31,10 +31,61 @@ namespace PlanningPoker.Engine.Core
         private readonly IServerStore _serverStore;
         private const int MaxPlayerNameLength = 20;
 
+        private static IList<string> FibCards => new List<string>
+        {
+            "1",
+            "2",
+            "3",
+            "5",
+            "8",
+            "13",
+            "21",
+            "?",
+            "de"
+        };
+        private static IList<string> HoursCards => new List<string>
+        {
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7",
+            "8",
+            "9",
+            "10",
+            "11",
+            "12",
+            "13",
+            "14",
+            "15",
+            "16",
+            "17",
+            "18",
+            "19",
+            "20",
+            "21",
+            "22",
+            "23",
+            "24",
+            "25",
+            "26",
+            "?",
+            "de"
+        };
+
         public PlanningPokerEngine(
             IServerStore serverStore)
         {
             _serverStore = serverStore;
+
+            _serverStore.Create(FibCards, new Guid("db164431-bf32-499a-8080-38eb5bb07768"), true); // Hitch
+            _serverStore.Create(HoursCards, new Guid("db164431-bf32-499a-8080-38eb5bb07769"), true); // Hitch Hour Cards version
+            _serverStore.Create(HoursCards, new Guid("ebe5200e-614b-4dea-a454-f814acf92f19"), true); // Inventory
+            _serverStore.Create(FibCards, new Guid("ebe5200e-614b-4dea-a454-f814acf92f10"), true); // Inventory Fib Cards version
+            _serverStore.Create(FibCards, new Guid("64abca5e-b4f0-4e3f-bdd7-ba36f1d485ef"), true); // Store
+            _serverStore.Create(HoursCards, new Guid("64abca5e-b4f0-4e3f-bdd7-ba36f1d485ea"), true); // Store Hour Cards version
         }
 
         public event EventHandler<PlayerKickedEventArgs> PlayerKicked;
@@ -99,8 +150,7 @@ namespace PlanningPoker.Engine.Core
 
         private void ClearOldAsleepPlayers(PokerServer server, string playerName)
         {
-            var twoHourAgo = DateTime.UtcNow.AddHours(-2);
-            var asleepPlayers = server.Players.Where(x => x.Value.Mode == PlayerMode.Asleep && x.Value.SleepDate < twoHourAgo);
+            var asleepPlayers = server.Players.Where(x => x.Value.Mode == PlayerMode.Asleep);
 
             var player = asleepPlayers.Select(x => x.Value).FirstOrDefault(x => x.Name == playerName);
             if (player != null)

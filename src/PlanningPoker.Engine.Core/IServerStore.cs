@@ -6,7 +6,7 @@ namespace PlanningPoker.Engine.Core
 {
     public interface IServerStore
     {
-        PokerServer Create(IList<string> cardSet);
+        PokerServer Create(IList<string> cardSet, Guid? guid = null, bool persistent = false);
 
         bool Exists(Guid id);
 

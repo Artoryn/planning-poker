@@ -32,13 +32,30 @@ namespace PlanningPoker.Server.Infrastructure.HostedServices
             {
                 if (cancellationToken.IsCancellationRequested) break;
 
-                var isOld = createdThreshold > server.Created;
                 var isEmptyOrAsleep = server.Players.All(p => p.Value.Mode != PlayerMode.Awake);
-                if (isOld && isEmptyOrAsleep)
+                if (server.Persistent)
                 {
-                    _serverStore.Remove(server);
+                    if (isEmptyOrAsleep)
+                    {
+                        var players = server.Players;
+                        foreach (var p in players)
+                        {
+                            if (p.Value != null)
+                                server.RemovePlayer(p.Value.Id);
+                        }
+                    }
+                }
+                else
+                {
+                    var isOld = createdThreshold > server.Created;
+                    if (isOld && isEmptyOrAsleep)
+                    {
+                        _serverStore.Remove(server);
+                    }
                 }
             }
+
+            var test = "test";
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
