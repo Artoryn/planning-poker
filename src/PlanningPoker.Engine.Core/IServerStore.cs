@@ -14,6 +14,8 @@ namespace PlanningPoker.Engine.Core
         
         ICollection<PokerServer> All();
 
+        int Count();
+
         void Remove(PokerServer server);
     }
 }
