@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using PlanningPoker.Engine.Core.Exceptions;
 using PlanningPoker.Engine.Core.Models;
 using PlanningPoker.Engine.Core.Models.Events;
@@ -30,6 +31,8 @@ namespace PlanningPoker.Engine.Core
     {
         private readonly IServerStore _serverStore;
         private const int MaxPlayerNameLength = 20;
+        private const int MaxPlayerCount = 40;
+        private const int MaxRoomCount = 20;
 
         private static IList<string> FibCards => new List<string>
         {
@@ -123,9 +126,9 @@ namespace PlanningPoker.Engine.Core
                 return (false, null, validationMessage);
             }
 
-            if (_serverStore.Count() > 20)
+            if (_serverStore.Count() > MaxRoomCount)
             {
-                return (false, null, "To many servers created. Please try an existing server or wait for auto cleanup.");
+                return (false, null, "To many rooms created. Please try an existing room or wait for auto cleanup (every 20 min).");
             }
 
             var server = _serverStore.Create(cardSet);
@@ -142,7 +145,18 @@ namespace PlanningPoker.Engine.Core
             if (string.IsNullOrWhiteSpace(playerName)) throw new MissingPlayerNameException();
 
             var server = _serverStore.Get(id);
-            
+
+            if (MaxPlayerCount > 0)
+            {
+                // Clear asleep players if max count is reached
+                if (server.Players.Count >= MaxPlayerCount)
+                    ClearOldAsleepPlayers(server);
+
+                // If the count of players is higher than max count fail
+                if (server.Players.Count(x => x.Value != null && x.Value.Mode != PlayerMode.Asleep) >= MaxPlayerCount)
+                    throw new PlayerCountException(MaxPlayerCount);
+            }
+
             var formattedPlayerName = playerName.Length > MaxPlayerNameLength ? playerName.Substring(0, MaxPlayerNameLength) : playerName;
             var newPlayer = server.AddOrUpdatePlayer(recoveryId, playerPrivateId, formattedPlayerName, type, tag);
 
@@ -161,6 +175,20 @@ namespace PlanningPoker.Engine.Core
             if (player != null)
             {
                 server.RemovePlayer(player.Id);
+            }
+        }
+
+        private void ClearOldAsleepPlayers(PokerServer server)
+        {
+            var asleepPlayers = server.Players.Where(x => x.Value != null && x.Value.Mode == PlayerMode.Asleep);
+
+            var players = asleepPlayers.Select(x => x.Value);
+            foreach (var player in players)
+            {
+                if (player != null)
+                {
+                    server.RemovePlayer(player.Id);
+                }
             }
         }
 
