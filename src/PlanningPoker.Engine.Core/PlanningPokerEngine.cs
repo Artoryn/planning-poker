@@ -89,6 +89,10 @@ namespace PlanningPoker.Engine.Core
             _serverStore.Create(FibCards, new Guid("ebe5200e-614b-4dea-a454-f814acf92f10"), true); // Inventory Fib Cards version
             _serverStore.Create(FibCards, new Guid("64abca5e-b4f0-4e3f-bdd7-ba36f1d485ef"), true); // Store
             _serverStore.Create(HoursCards, new Guid("64abca5e-b4f0-4e3f-bdd7-ba36f1d485ea"), true); // Store Hour Cards version
+
+            // Non Retail Teams
+            _serverStore.Create(HoursCards, new Guid("e6936010-1335-464f-ad11-e8c04f4eb340"), true);
+            _serverStore.Create(FibCards, new Guid("e6936010-1335-464f-ad11-e8c04f4eb341"), true);
         }
 
         public event EventHandler<PlayerKickedEventArgs> PlayerKicked;
