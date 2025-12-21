@@ -42,7 +42,6 @@ namespace PlanningPoker.Engine.Core
             "5",
             "8",
             "13",
-            "21",
             "?",
             "de"
         };
